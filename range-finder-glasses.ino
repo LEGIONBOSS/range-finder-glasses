@@ -21,6 +21,7 @@ ShiftRegister74HC595<2> sreg(PIN_SHIFTREG_DATA, PIN_SHIFTREG_CLOCK, PIN_SHIFTREG
 
 static uint8_t digit_lut[10]
 {
+    // https://robojax.com/RJT582
     0b11000000, // 0
     0b11111001, // 1
     0b10100100, // 2
