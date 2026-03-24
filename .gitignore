@@ -108,3 +108,4 @@ $RECYCLE.BIN/
 .build/*
 .test/*
 [Tt]est.*
+*.drawio.bkp
