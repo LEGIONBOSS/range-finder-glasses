@@ -1,34 +1,51 @@
+/*
+  HCSR04 - Library for arduino, for HC-SR04 ultrasonic distance sensor.
+  Created by Martin Sosic, June 11, 2016.
+*/
+
+#include "Arduino.h"
 #include "HCSR04.h"
-////////////////////////////////////consttruct/destruct
-void HCSR04::init(int out, int echo[], int n)
-{
-	this->out = out;
-	this->echo = echo;
-	this->n = n;
-	pinMode(this->out, OUTPUT);
-	for (int i = 0; i < n; i++)
-		pinMode(this->echo[i], INPUT);
-}
-HCSR04::HCSR04(int out, int echo) { this->init(out, new int[1]{echo}, 1); }
-HCSR04::HCSR04(int out, int echo[], int n) { this->init(out, echo, n); }
-HCSR04::~HCSR04()
-{
-	~this->out;
-	delete[] this->echo;
-	~this->n;
+
+UltraSonicDistanceSensor::UltraSonicDistanceSensor(
+        byte triggerPin, byte echoPin, unsigned short maxDistanceCm, unsigned long maxTimeoutMicroSec) {
+    this->triggerPin = triggerPin;
+    this->echoPin = echoPin;
+    this->maxDistanceCm = maxDistanceCm;
+    this->maxTimeoutMicroSec = maxTimeoutMicroSec;
+    pinMode(triggerPin, OUTPUT);
+    pinMode(echoPin, INPUT);
 }
 
-///////////////////////////////////////////////////dist
-float HCSR04::dist(int n) const
-{
-	digitalWrite(this->out, LOW);
-	delayMicroseconds(2);
-	digitalWrite(this->out, HIGH);
-	delayMicroseconds(10);
-	digitalWrite(this->out, LOW);
-	noInterrupts();
-	float d = pulseIn(this->echo[n], HIGH, 23529.4); // max sensor dist ~4m
-	interrupts();
-	return d / 58.8235;
+float UltraSonicDistanceSensor::measureDistanceCm() {
+    //Using the approximate formula 19.307°C results in roughly 343m/s which is the commonly used value for air.
+    return measureDistanceCm(19.307);
 }
-float HCSR04::dist() const { return this->dist(0); }
+
+float UltraSonicDistanceSensor::measureDistanceCm(float temperature) {
+    unsigned long maxDistanceDurationMicroSec;
+
+    // Make sure that trigger pin is LOW.
+    digitalWrite(triggerPin, LOW);
+    delayMicroseconds(2);
+    // Hold trigger for 10 microseconds, which is signal for sensor to measure distance.
+    digitalWrite(triggerPin, HIGH);
+    delayMicroseconds(10);
+    digitalWrite(triggerPin, LOW);
+    float speedOfSoundInCmPerMicroSec = 0.03313 + 0.0000606 * temperature; // Cair ≈ (331.3 + 0.606 ⋅ ϑ) m/s
+
+    // Compute max delay based on max distance with 25% margin in microseconds
+    maxDistanceDurationMicroSec = 2.5 * maxDistanceCm / speedOfSoundInCmPerMicroSec;
+    if (maxTimeoutMicroSec > 0) {
+    	maxDistanceDurationMicroSec = min(maxDistanceDurationMicroSec, maxTimeoutMicroSec);
+    }
+
+    // Measure the length of echo signal, which is equal to the time needed for sound to go there and back.
+    unsigned long durationMicroSec = pulseIn(echoPin, HIGH, maxDistanceDurationMicroSec); // can't measure beyond max distance
+
+    float distanceCm = durationMicroSec / 2.0 * speedOfSoundInCmPerMicroSec;
+    if (distanceCm == 0 || distanceCm > maxDistanceCm) {
+        return -1.0 ;
+    } else {
+        return distanceCm;
+    }
+}
