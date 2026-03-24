@@ -7,7 +7,7 @@ Arduino sketch for the "KINFO Tortura" range finder glasses
 
 ## Communication
 
-The **ATTiny85 MCU** reads the distance from a **HC-SR04 Ultrasonic Distance Sensor** once a second, and displays in on a **2 Digit 7 Segment Display** in meters with one whole number and one decimal.
+The **Arduino Pro Mini** reads the distance from a **HC-SR04 Ultrasonic Distance Sensor** once a second, and displays in on a **2 Digit 7 Segment Display** in meters with one whole number and one decimal.
 
 | ![img/communication.png](img/communication.png) |
 | :-: |
@@ -15,7 +15,7 @@ The **ATTiny85 MCU** reads the distance from a **HC-SR04 Ultrasonic Distance Sen
 
 | Component | Store URL |
 | --- | --- |
-| ATTiny85 MCU | [https://www.hestore.hu/prod_10028798.html](https://www.hestore.hu/prod_10028798.html) |
+| Arduino Pro Mini 5V | [https://www.hestore.hu/prod_10035581.html](https://www.hestore.hu/prod_10035581.html) |
 | HC-SR04 Ultrasonic Distance Sensor | [https://techfun.hu/termek/hc-sr04-ultrahangos-tavolsagerzekelo](https://techfun.hu/termek/hc-sr04-ultrahangos-tavolsagerzekelo) |
 | 2 Digit 7 Segment Display | [https://techfun.hu/termek/szegmenskeszlet-74hc595-meghajtoval-kulonfele-valtozatok/?attribute_pa_valtozatok=2-displeje](https://techfun.hu/termek/szegmenskeszlet-74hc595-meghajtoval-kulonfele-valtozatok/?attribute_pa_valtozatok=2-displeje) |
 
