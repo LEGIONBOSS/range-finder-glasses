@@ -10,14 +10,13 @@
 #include "src/HCSR04/HCSR04.h"                             // https://github.com/Martinsos/arduino-lib-hc-sr04
 #include "src/ShiftRegister74HC595/ShiftRegister74HC595.h" // https://github.com/Simsso/ShiftRegister74HC595
 
-#define SONAR_PIN_TRIG (PB3)     // HC-SR04 trigger pin
-#define SONAR_PIN_ECHO (PB4)     // HC-SR04 echo pin
-#define SONAR_MAX_CM (400)       // HC-SR04 max distance (cm)
-#define SHIFTREG_PIN_DATA (PB2)  // 74HC595 data pin
-#define SHIFTREG_PIN_CLOCK (PB1) // 74HC595 clock pin
-#define SHIFTREG_PIN_LATCH (PB0) // 74HC595 latch pin
+#define SONAR_PIN_TRIG (A3)     // HC-SR04 trigger pin
+#define SONAR_PIN_ECHO (A2)     // HC-SR04 echo pin
+#define SHIFTREG_PIN_DATA (A1)  // 74HC595 data pin
+#define SHIFTREG_PIN_CLOCK (A0) // 74HC595 clock pin
+#define SHIFTREG_PIN_LATCH (13) // 74HC595 latch pin
 
-UltraSonicDistanceSensor sonar(SONAR_PIN_TRIG, SONAR_PIN_ECHO, SONAR_MAX_CM);
+UltraSonicDistanceSensor sonar(SONAR_PIN_TRIG, SONAR_PIN_ECHO);
 ShiftRegister74HC595<2> sreg(SHIFTREG_PIN_DATA, SHIFTREG_PIN_CLOCK, SHIFTREG_PIN_LATCH);
 
 static const uint8_t _digit_lut[10]
@@ -34,8 +33,7 @@ static const uint8_t _digit_lut[10]
     0b10010000  // 9         3     7
 };
 
-// 15   MSB    8 7     LSB     0
-// [whole digit] [decimal digit]
+// whole digit -> high byte, decimal digit -> low byte
 static uint16_t dist_to_byte(float dist_cm)
 {
     // Cast to uint16_t first, otherwise it overflows after 255cm
@@ -63,7 +61,7 @@ void loop(void)
     // Set display
     uint16_t digits = dist_to_byte(dist_cm);
     uint8_t pin_values[2];
-    pin_values[0] = (uint8_t)(digits >> 8); // MSB byte, left digit
-    pin_values[1] = (uint8_t)(digits);      // LSB byte, right digit
+    pin_values[0] = (uint8_t)(digits >> 8); // Low byte, left digit
+    pin_values[1] = (uint8_t)(digits);      // High byte, right digit
     sreg.setAll(pin_values);
 }
